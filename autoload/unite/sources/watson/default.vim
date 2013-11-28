@@ -1,5 +1,5 @@
 function! unite#sources#watson#default#define() "{{{
-  return s:source
+  return [s:source, s:source_clean, s:source_dirty]
 endfunction"}}}
 
 let s:source = {
@@ -47,8 +47,6 @@ function! s:source.hooks.on_syntax(args, context) "{{{
   syntax match uniteSource__WatsonSeparator /:/ contained
         \ containedin=uniteSource__WatsonPath
 
-
-
   highlight WatsonBracket cterm=NONE gui=bold cterm=bold
   highlight WatsonBad guifg=#cd5c5c guibg=NONE guisp=NONE gui=NONE ctermfg=167 ctermbg=NONE cterm=NONE
   highlight WatsonGood term=bold ctermfg=114 gui=italic guifg=#7ccd7c
@@ -65,7 +63,22 @@ function! s:source.hooks.on_syntax(args, context) "{{{
   " highlight default link uniteSource__WatsonFirstLine Error
   highlight default link uniteSource__WatsonTagName Type
 endfunction"}}}
-
 function! s:source.gather_candidates(args, context) "{{{
   return unite#sources#watson#utils#get_results(expand('%:p'), '')
+endfunction"}}}
+
+let s:source_clean = copy(s:source)
+let s:source_clean.name = 'watson/clean'
+function! s:source_clean.gather_candidates(args, context) "{{{
+  let result = unite#sources#watson#utils#get_results(expand('%:p'), '')
+  call filter(result, '!v:val["action__has_issue"]')
+  return result
+endfunction"}}}
+
+let s:source_dirty = copy(s:source)
+let s:source_dirty.name = 'watson/dirty'
+function! s:source_dirty.gather_candidates(args, context) "{{{
+  let result = unite#sources#watson#utils#get_results(expand('%:p'), '')
+  call filter(result, 'v:val["action__has_issue"]')
+  return result
 endfunction"}}}

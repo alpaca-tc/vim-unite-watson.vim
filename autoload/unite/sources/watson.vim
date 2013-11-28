@@ -1,8 +1,6 @@
 function! unite#sources#watson#define() "{{{
   if s:is_available()
-    return [
-          \ unite#sources#watson#default#define(),
-          \ ]
+    return unite#sources#watson#default#define()
   else
     return []
   endif
