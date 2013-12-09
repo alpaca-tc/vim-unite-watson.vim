@@ -1,15 +1,15 @@
-function! unite#sources#watson#default#define() "{{{
-  return [s:source, s:source_clean, s:source_dirty]
-endfunction"}}}
-
 let s:source = {
-      \ 'name' : 'watson',
+      \ 'name' : 'watson/current_file',
       \ 'hooks' : {},
       \ 'syntax' : 'uniteSource__WatsonDefault',
       \ 'is_multiline' : 1,
       \ 'description' : 'candidates from watson',
       \ 'default_kind' : 'jump_list',
       \ }
+
+function! unite#sources#watson#current_file#define() "{{{
+  return [s:source]
+endfunction"}}}
 
 function! s:source.hooks.on_syntax(args, context) "{{{
   syntax case ignore
@@ -60,49 +60,36 @@ function! s:source.hooks.on_syntax(args, context) "{{{
   " highlight default link uniteSource__WatsonTagName Type
   highlight default link uniteSource__WatsonTag Type
 endfunction"}}}
+
 function! s:source.gather_candidates(args, context) "{{{
-  let result = unite#sources#watson#utils#get_results(expand('%:p'), '')
-  call map(result, 's:format_json(v:val)')
+  let absolute_path = expand('%:p')
+  let option = '--files ' . absolute_path
+  let candidates = unite#sources#watson#utils#get_results(absolute_path, option)
 
-  return result
-endfunction"}}}
-
-let s:source_clean = copy(s:source)
-let s:source_clean.name = 'watson/clean'
-function! s:source_clean.gather_candidates(args, context) "{{{
-  let result = unite#sources#watson#utils#get_results(expand('%:p'), '')
-  call filter(result, '!v:val["action__has_issue"]')
-  call map(result, 's:format_json(v:val)')
-
-  return result
-endfunction"}}}
-
-let s:source_dirty = copy(s:source)
-let s:source_dirty.name = 'watson/dirty'
-function! s:source_dirty.gather_candidates(args, context) "{{{
-  let result = unite#sources#watson#utils#get_results(expand('%:p'), '')
-  call filter(result, 'v:val["action__has_issue"]')
-  call map(result, 's:format_json(v:val)')
-  return result
-endfunction"}}}
-
-function! s:format_json(candidate) "{{{
-  let c = a:candidate
-
-  if c['action__has_issue'] == 0
-    let c.word = '[o] ' . c['action__relative_path']
-    let c.is_multiline = 0
+  if empty(candidates)
+    let header = { 'word' : 'No issue found', 'is_dummy' : 1 }
+    return header
   else
-    let line = get(c, 'action__line', '')
-    let file_path = '(' . c['action__relative_path'] . ':' . line . ')'
-
-    let tag       = get(c, 'action__tag', '')
-    let title     = get(c, 'action__title', '')
-
-    let title_formatted = '  - ' . title
-    let word = join(['[x]', tag, file_path], ' ') . "\n" . title_formatted
-    let c.word = word
+    return map(sort(candidates, 's:sort'), 's:format(v:val)')
   endif
-
-  return c
 endfunction"}}}
+
+function! s:sort(a, b)
+  if !has_key(a:a, 'action__line')
+    return a:a
+  elseif !has_key(a:b, 'action__line')
+    return a:b
+  else
+    return a:a["action__line"] < a:b["action__line"]
+  end
+endfunction
+
+function! s:format(candidate)
+  let c = a:candidate
+  " let tag = '[' . c['action__tag'] . ']'
+  let title = c['action__title']
+  " let line = c['action__line']
+
+  " let c.word = 'L' . line . ' ' . tag . ' ' . title
+  return c
+endfunction
