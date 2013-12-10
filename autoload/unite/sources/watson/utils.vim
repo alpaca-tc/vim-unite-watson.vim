@@ -7,6 +7,7 @@ function! unite#sources#watson#utils#get_results(path, options) "{{{
     let project_dir = unite#util#path2project_directory(a:path)
     lcd `=project_dir`
     let command = 'watson --format unite ' . a:options
+    call unite#print_message(command)
     call system(command)
     let result = s:read_json_from(project_dir . '/.watsonresults')
   catch /.*/
