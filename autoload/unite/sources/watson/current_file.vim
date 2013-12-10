@@ -1,7 +1,7 @@
 let s:source = {
       \ 'name' : 'watson/current_file',
       \ 'hooks' : {},
-      \ 'syntax' : 'uniteSource__WatsonDefault',
+      \ 'syntax' : 'uniteSource__WatsonCurrentFile',
       \ 'is_multiline' : 1,
       \ 'description' : 'candidates from watson',
       \ 'default_kind' : 'jump_list',
@@ -13,52 +13,14 @@ endfunction"}}}
 
 function! s:source.hooks.on_syntax(args, context) "{{{
   syntax case ignore
-  syntax region uniteSource__WatsonLine start=' ' end='$'
-  " -- Second line
-  " \ start='  |     \w\+ - ' end='$'
-  " syntax region uniteSource__WatsonSecondLine
-  "       \ start='\zs  |     \w\+ - ' end='$'
-  "       \ containedin=uniteSource__WatsonDefault
-  " syntax match uniteSource__WatsonTag /^\s\+|\s\+\w - /
-  "       \ containedin=uniteSource__WatsonSecondLine
-
-  " -- First line
-  " g.u
-  " [o] Rakefile
-  " [x] review (watson.gemspec:2)
-  syntax region uniteSource__WatsonFirstLine
-        \ start='\s*\[\(o\|x\)]' end='$'
-        \ containedin=uniteSource__WatsonLine
-  syntax match uniteSource__WatsonBracket /\[\(o\|x\)]/
-        \ contained containedin=uniteSource__WatsonFirstLine
-  syntax match uniteSource__WatsonResultGood /o/ contained containedin=uniteSource__WatsonBracket
-  syntax match uniteSource__WatsonResultBad /x/ contained containedin=uniteSource__WatsonBracket
-  syntax match uniteSource__WatsonTag / \(\w\+\) (/ms=s+1,me=e-2
-        \ containedin=uniteSource__WatsonFirstLine
-
-  " syntax match uniteSource__WatsonTagName
-  "       \ "\<\%(fix\|todo\|review\)\>[?!]\@!"
-  "       \ containedin=uniteSource__WatsonTag
-
-  " filepath
-  syntax match uniteSource__WatsonPath /([^)]\+)/ contained
-        \ containedin=uniteSource__WatsonFirstLine
-
-  highlight WatsonBracket cterm=NONE gui=bold cterm=bold
-  highlight WatsonBad guifg=#cd5c5c guibg=NONE guisp=NONE gui=NONE ctermfg=167 ctermbg=NONE cterm=NONE
-  highlight WatsonGood term=bold ctermfg=114 gui=italic guifg=#7ccd7c
-
-  " [o], [x]
-  highlight default link uniteSource__WatsonBracket WatsonBracket
-  highlight default link uniteSource__WatsonResultBad WatsonBad
-  highlight default link uniteSource__WatsonResultGood WatsonGood
-
-  " filepath
-  highlight default link uniteSource__WatsonPath Directory
-
-  " highlight default link uniteSource__WatsonFirstLine Error
-  " highlight default link uniteSource__WatsonTagName Type
-  highlight default link uniteSource__WatsonTag Type
+  syntax region uniteSource__WatsonLine start='^' end='$'
+  syntax match uniteSource__WatsonTagInformation /^\s*\d\+:\s\w\+\s/me=e-1
+  syntax match uniteSource__WatsonTag /\a\+\ze/
+        \ contained containedin=uniteSource__WatsonTagInformation
+  syntax match uniteSource__WatsonLineNr /^\s*\d\+:/
+        \ contained containedin=uniteSource__WatsonTagInformation
+  highlight! default link uniteSource__WatsonLineNr LineNr
+  highlight! default link uniteSource__WatsonTag Type
 endfunction"}}}
 
 function! s:source.gather_candidates(args, context) "{{{
@@ -74,22 +36,27 @@ function! s:source.gather_candidates(args, context) "{{{
   endif
 endfunction"}}}
 
-function! s:sort(a, b)
+function! s:sort(a, b) "{{{
   if !has_key(a:a, 'action__line')
     return a:a
   elseif !has_key(a:b, 'action__line')
     return a:b
   else
-    return a:a["action__line"] < a:b["action__line"]
+    return a:a["action__line"] > a:b["action__line"]
   end
-endfunction
+endfunction"}}}
 
-function! s:format(candidate)
+function! s:format(candidate) "{{{
   let c = a:candidate
-  " let tag = '[' . c['action__tag'] . ']'
+  let tag = c['action__tag']
   let title = c['action__title']
-  " let line = c['action__line']
+  let line = c['action__line']
 
-  " let c.word = 'L' . line . ' ' . tag . ' ' . title
+  let len = len(line('$'))
+  let line_reg = '%' . len . 'd'
+  let pattern = line_reg . ": %-7s %s"
+
+  let c.abbr = printf(pattern, line, tag, title)
+
   return c
-endfunction
+endfunction"}}}
