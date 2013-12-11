@@ -17,7 +17,7 @@ Bundle 'Shougo/unite.vim'
 NeoBundleLazy 'alpaca-tc/vim-unite-watson.vim', {
       \ 'depends' : 'Shougo/unite.vim',
       \ 'autoload' : {
-      \   'unite_sources' : ['watson', 'watson/dirty', 'watson/clean'],
+      \   'unite_sources' : ['watson', 'watson/dirty', 'watson/clean', 'watson/current_file'],
       \ }}
 ```
 
