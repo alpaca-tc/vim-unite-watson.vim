@@ -1,8 +1,8 @@
 function! unite#sources#watson#default#define() "{{{
-  return [s:source, s:source_clean, s:source_dirty]
+  return [s:watson, s:watson_clean, s:watson_dirty]
 endfunction"}}}
 
-let s:source = {
+let s:watson = {
       \ 'name' : 'watson',
       \ 'hooks' : {},
       \ 'syntax' : 'uniteSource__WatsonDefault',
@@ -10,8 +10,7 @@ let s:source = {
       \ 'description' : 'candidates from watson',
       \ 'default_kind' : 'jump_list',
       \ }
-
-function! s:source.hooks.on_syntax(args, context) "{{{
+function! s:watson.hooks.on_syntax(args, context) "{{{
   syntax case ignore
   syntax region uniteSource__WatsonLine start=' ' end='$'
   " -- Second line
@@ -60,33 +59,34 @@ function! s:source.hooks.on_syntax(args, context) "{{{
   " highlight default link uniteSource__WatsonTagName Type
   highlight default link uniteSource__WatsonTag Type
 endfunction"}}}
-function! s:source.gather_candidates(args, context) "{{{
+function! s:watson.gather_candidates(args, context) "{{{
   let result = unite#sources#watson#utils#get_results(expand('%:p'), '')
-  call map(result, 's:format_json(v:val)')
+  call map(result, 's:format_candidate(v:val)')
 
   return result
 endfunction"}}}
 
-let s:source_clean = copy(s:source)
-let s:source_clean.name = 'watson/clean'
-function! s:source_clean.gather_candidates(args, context) "{{{
+let s:watson_clean = copy(s:watson)
+let s:watson_clean.name = 'watson/clean'
+function! s:watson_clean.gather_candidates(args, context) "{{{
   let result = unite#sources#watson#utils#get_results(expand('%:p'), '')
   call filter(result, '!v:val["action__has_issue"]')
-  call map(result, 's:format_json(v:val)')
+  call map(result, 's:format_candidate(v:val)')
 
   return result
 endfunction"}}}
 
-let s:source_dirty = copy(s:source)
-let s:source_dirty.name = 'watson/dirty'
-function! s:source_dirty.gather_candidates(args, context) "{{{
+let s:watson_dirty = copy(s:watson)
+let s:watson_dirty.name = 'watson/dirty'
+function! s:watson_dirty.gather_candidates(args, context) "{{{
   let result = unite#sources#watson#utils#get_results(expand('%:p'), '')
   call filter(result, 'v:val["action__has_issue"]')
-  call map(result, 's:format_json(v:val)')
+  call map(result, 's:format_candidate(v:val)')
+
   return result
 endfunction"}}}
 
-function! s:format_json(candidate) "{{{
+function! s:format_candidate(candidate) "{{{
   let c = a:candidate
 
   if c['action__has_issue'] == 0

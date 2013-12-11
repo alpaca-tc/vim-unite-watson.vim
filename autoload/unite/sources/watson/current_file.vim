@@ -28,11 +28,10 @@ function! s:source.gather_candidates(args, context) "{{{
   let option = '--files ' . absolute_path
   let candidates = unite#sources#watson#utils#get_results(absolute_path, option)
 
-  if empty(candidates)
-    let header = { 'word' : 'No issue found', 'is_dummy' : 1 }
-    return header
-  else
+  if !empty(candidates) && candidates[0].action__has_issue
     return map(sort(candidates, 's:sort'), 's:format(v:val)')
+  else
+    return []
   endif
 endfunction"}}}
 

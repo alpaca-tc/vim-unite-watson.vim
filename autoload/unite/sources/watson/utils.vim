@@ -1,20 +1,12 @@
 let s:JSON = vital#of('vital').import('Web.JSON')
 
-function! unite#sources#watson#utils#get_results(path, options) "{{{
-  let current_path = getcwd()
+function! unite#sources#watson#utils#get_results(path, option) "{{{
+  let command = '--format unite ' . a:option
+  call watson#system#execute_from_project_root(a:path, command)
 
-  try
-    let project_dir = unite#util#path2project_directory(a:path)
-    lcd `=project_dir`
-    let command = 'watson --format unite ' . a:options
-    call unite#print_message(command)
-    call system(command)
-    let result = s:read_json_from(project_dir . '/.watsonresults')
-  catch /.*/
-    let result = []
-  finally
-    lcd `=current_path`
-  endtry
+  let project_root = unite#util#path2project_directory(a:path)
+  let result_file = project_root . '/.watsonresults'
+  let result = s:read_json_from(result_file)
 
   return result
 endfunction"}}}
