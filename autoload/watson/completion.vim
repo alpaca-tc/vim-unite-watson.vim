@@ -26,7 +26,7 @@ function! watson#completion#do_complete(args) "{{{
     if count(s:skip_arguments, last)
       return s:default_arguments
     elseif last =~ '^-'
-      return filter(copy(s:default_arguments), "v:val =~ '^' . last")
+      return s:filter(s:default_arguments, last)
     else
       let last_option = s:last_option(args)
 
@@ -39,38 +39,6 @@ function! watson#completion#do_complete(args) "{{{
   endif
 endfunction"}}}
 
-function! s:dispatch_completion(last_option, last) "{{{
-  let function = ''
-
-  if a:last_option =~ '\v(-c|--context-depth)'
-    let function = 'context_depth'
-  elseif a:last_option =~ '\v(-d|--dirs)'
-    let function = 'dirs'
-  elseif a:last_option =~ '\v(-f|--files)'
-    let function = 'files'
-  elseif a:last_option =~ '\v(--format)'
-    let function = 'format'
-  elseif a:last_option =~ '\v(-h|--help)'
-    let function = 'help'
-  elseif a:last_option =~ '\v(-i|--ignore)'
-    let function = 'ignore'
-  elseif a:last_option =~ '\v(-p|--parse-depth)'
-    let function = 'parse_depth'
-  elseif a:last_option =~ '\v(-r|--remote)'
-    let function = 'remote'
-  elseif a:last_option =~ '\v(-s|--show)'
-    let function = 'show'
-  elseif a:last_option =~ '\v(-t|--tags)'
-    let function = 'tags'
-  elseif a:last_option =~ '\v(-u|--update)'
-    let function = 'update'
-  else
-    return []
-  endif
-
-  return watson#completion#{function}(a:last)
-endfunction"}}}
-
 function! s:last_option(args) "{{{
   let args = copy(a:args)
   call filter(args, 'v:val =~ "^-"')
@@ -78,47 +46,73 @@ function! s:last_option(args) "{{{
   return empty(args) ? '' : args[-1]
 endfunction"}}}
 
-" Completions
-function! watson#completion#context_depth(arg) "{{{
-  return []
+function! s:dispatch_completion(last_option, last) "{{{
+  let function = ''
+
+  if a:last_option =~ '^\v(-d|--dirs)$'
+    let function = 'dirs'
+  elseif a:last_option =~ '^\v(-f|--files)$'
+    let function = 'files'
+  elseif a:last_option =~ '^\v(--format)$'
+    let function = 'format'
+  elseif a:last_option =~ '^\v(-i|--ignore)$'
+    let function = 'ignore'
+  elseif a:last_option =~ '^\v(-p|--parse-depth)$'
+    let function = 'parse_depth'
+  elseif a:last_option =~ '^\v(-r|--remote)$'
+    let function = 'remote'
+  elseif a:last_option =~ '^\v(-s|--show)$'
+    let function = 'show'
+  elseif a:last_option =~ '^\v(-t|--tags)$'
+    let function = 'tags'
+  elseif a:last_option =~ '^\v(-u|--update)$'
+    let function = 'update'
+  else
+    " help, version, update, context-depth, parse-depth
+    return []
+  endif
+
+  return watson#completion#{function}(a:last)
 endfunction"}}}
 
+" Completions {{{
 function! watson#completion#dirs(arg) "{{{
-  return []
+  let file_and_dir = split(glob(a:arg . '*'), '\n')
+  let candidates = filter(file_and_dir, 'isdirectory(v:val)')
+
+  return sort(candidates)
 endfunction"}}}
 
 function! watson#completion#files(arg) "{{{
-  return []
+  let candidates = filter(
+        \ map(split(glob(a:arg . '*'), '\n'),
+        \ "isdirectory(v:val) ? v:val.'/' : v:val"),
+        \ 'stridx(v:val, a:arg) == 0')
+
+  return sort(candidates)
 endfunction"}}}
 
 function! watson#completion#format(arg) "{{{
-  return []
-endfunction"}}}
-
-function! watson#completion#help(arg) "{{{
-  return []
+  return s:filter(['default', 'json', 'silent', 'unite'], a:arg)
 endfunction"}}}
 
 function! watson#completion#ignore(arg) "{{{
   return []
 endfunction"}}}
 
-function! watson#completion#parse_depth(arg) "{{{
-  return []
-endfunction"}}}
-
 function! watson#completion#remote(arg) "{{{
-  return []
+  return s:filter(['github', 'bitbucket'], a:arg)
 endfunction"}}}
 
 function! watson#completion#show(arg) "{{{
-  return []
+  return s:filter(['all', 'dirty', 'clean'], a:arg)
 endfunction"}}}
 
 function! watson#completion#tags(arg) "{{{
-  return []
+  return s:filter(['todo', 'review', 'fix', a:arg], a:arg)
 endfunction"}}}
+"}}}
 
-function! watson#completion#update(arg) "{{{
-  return []
+function! s:filter(candidates, val) "{{{
+  return filter(copy(a:candidates), "v:val =~ '^' . a:val")
 endfunction"}}}
