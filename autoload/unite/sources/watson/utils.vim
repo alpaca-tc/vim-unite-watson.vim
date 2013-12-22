@@ -1,4 +1,4 @@
-let s:JSON = vital#of('vital').import('Web.JSON')
+let s:JSON = vital#of('vim-unite-watson.vim').import('Web.JSON')
 
 function! unite#sources#watson#utils#get_results(path, option) "{{{
   let command = '--format unite ' . a:option
