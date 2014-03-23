@@ -16,7 +16,7 @@ let s:skip_arguments = [
       \ '-v', '--version',
       \ ]
 
-function! watson#completion#do_complete(args) "{{{
+function! tamago#completion#do_complete(args) "{{{
   let args = a:args
 
   if empty(args)
@@ -72,18 +72,18 @@ function! s:dispatch_completion(last_option, last) "{{{
     return []
   endif
 
-  return watson#completion#{function}(a:last)
+  return tamago#completion#{function}(a:last)
 endfunction"}}}
 
 " Completions {{{
-function! watson#completion#dirs(arg) "{{{
+function! tamago#completion#dirs(arg) "{{{
   let file_and_dir = split(glob(a:arg . '*'), '\n')
   let candidates = filter(file_and_dir, 'isdirectory(v:val)')
 
   return sort(candidates)
 endfunction"}}}
 
-function! watson#completion#files(arg) "{{{
+function! tamago#completion#files(arg) "{{{
   let candidates = filter(
         \ map(split(glob(a:arg . '*'), '\n'),
         \ "isdirectory(v:val) ? v:val.'/' : v:val"),
@@ -92,23 +92,23 @@ function! watson#completion#files(arg) "{{{
   return sort(candidates)
 endfunction"}}}
 
-function! watson#completion#format(arg) "{{{
+function! tamago#completion#format(arg) "{{{
   return s:filter(['default', 'json', 'silent', 'unite'], a:arg)
 endfunction"}}}
 
-function! watson#completion#ignore(arg) "{{{
+function! tamago#completion#ignore(arg) "{{{
   return []
 endfunction"}}}
 
-function! watson#completion#remote(arg) "{{{
+function! tamago#completion#remote(arg) "{{{
   return s:filter(['github', 'bitbucket'], a:arg)
 endfunction"}}}
 
-function! watson#completion#show(arg) "{{{
+function! tamago#completion#show(arg) "{{{
   return s:filter(['all', 'dirty', 'clean'], a:arg)
 endfunction"}}}
 
-function! watson#completion#tags(arg) "{{{
+function! tamago#completion#tags(arg) "{{{
   return s:filter(['todo', 'review', 'fix', a:arg], a:arg)
 endfunction"}}}
 "}}}

@@ -1,17 +1,17 @@
-function! unite#sources#watson#default#define() "{{{
-  return [s:watson, s:watson_clean, s:watson_dirty]
+function! unite#sources#tamago#default#define() "{{{
+  return [s:tamago, s:tamago_clean, s:tamago_dirty]
 endfunction"}}}
 
-let s:watson = {
-      \ 'name' : 'watson',
+let s:tamago = {
+      \ 'name' : 'tamago',
       \ 'hooks' : {},
       \ 'syntax' : 'uniteSource__WatsonDefault',
       \ 'is_multiline' : 1,
-      \ 'description' : 'candidates from watson',
+      \ 'description' : 'candidates from tamago',
       \ 'default_kind' : 'jump_list',
       \ }
-function! s:watson.hooks.on_syntax(args, context) "{{{
-  syntax case ignore
+function! s:tamago.hooks.on_syntax(args, context) "{{{
+  " syntax case ignore
   syntax region uniteSource__WatsonLine start=' ' end='$'
   " -- Second line
   " \ start='  |     \w\+ - ' end='$'
@@ -24,7 +24,7 @@ function! s:watson.hooks.on_syntax(args, context) "{{{
   " -- First line
   " g.u
   " [o] Rakefile
-  " [x] review (watson.gemspec:2)
+  " [x] review (tamago.gemspec:2)
   syntax region uniteSource__WatsonFirstLine
         \ start='\s*\[\(o\|x\)]' end='$'
         \ containedin=uniteSource__WatsonLine
@@ -59,27 +59,27 @@ function! s:watson.hooks.on_syntax(args, context) "{{{
   " highlight default link uniteSource__WatsonTagName Type
   highlight default link uniteSource__WatsonTag Type
 endfunction"}}}
-function! s:watson.gather_candidates(args, context) "{{{
-  let result = unite#sources#watson#utils#get_results(expand('%:p'), '')
+function! s:tamago.gather_candidates(args, context) "{{{
+  let result = unite#sources#tamago#utils#get_results(expand('%:p'), '')
   call map(result, 's:format_candidate(v:val)')
 
   return result
 endfunction"}}}
 
-let s:watson_clean = copy(s:watson)
-let s:watson_clean.name = 'watson/clean'
-function! s:watson_clean.gather_candidates(args, context) "{{{
-  let result = unite#sources#watson#utils#get_results(expand('%:p'), '')
+let s:tamago_clean = copy(s:tamago)
+let s:tamago_clean.name = 'tamago/clean'
+function! s:tamago_clean.gather_candidates(args, context) "{{{
+  let result = unite#sources#tamago#utils#get_results(expand('%:p'), '')
   call filter(result, '!v:val["action__has_issue"]')
   call map(result, 's:format_candidate(v:val)')
 
   return result
 endfunction"}}}
 
-let s:watson_dirty = copy(s:watson)
-let s:watson_dirty.name = 'watson/dirty'
-function! s:watson_dirty.gather_candidates(args, context) "{{{
-  let result = unite#sources#watson#utils#get_results(expand('%:p'), '')
+let s:tamago_dirty = copy(s:tamago)
+let s:tamago_dirty.name = 'tamago/dirty'
+function! s:tamago_dirty.gather_candidates(args, context) "{{{
+  let result = unite#sources#tamago#utils#get_results(expand('%:p'), '')
   call filter(result, 'v:val["action__has_issue"]')
   call map(result, 's:format_candidate(v:val)')
 

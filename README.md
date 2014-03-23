@@ -1,10 +1,10 @@
 # README
 
-vim-unite-watson.vim is the [unite](https://github.com/Shougo/unite.vim) source for [watson](https://github.com/nhmood/watson-ruby).
+vim-unite-tamago.vim is the [unite](https://github.com/Shougo/unite.vim) source for [tamago](https://github.com/nhmood/tamago-ruby).
 
-**:Unite watson**
+**:Unite tamago**
 
-![:Unite watson](https://f.cloud.github.com/assets/1688137/1726147/ac9b52fc-628a-11e3-8117-ef4824444729.gif)
+![:Unite tamago](https://f.cloud.github.com/assets/1688137/1726147/ac9b52fc-628a-11e3-8117-ef4824444729.gif)
 
 **:Watson**
 
@@ -17,32 +17,32 @@ vim-unite-watson.vim is the [unite](https://github.com/Shougo/unite.vim) source 
 ```vim
 " Using Bundle
 Bundle 'Shougo/unite.vim'
-Bundle 'alpaca-tc/vim-unite-watson.vim'
+Bundle 'alpaca-tc/vim-unite-tamago.vim'
 
 " Using NeoBundle
-NeoBundleLazy 'alpaca-tc/vim-unite-watson.vim', {
+NeoBundleLazy 'alpaca-tc/vim-unite-tamago.vim', {
       \ 'commands' : 'Watson',
       \ 'depends' : 'Shougo/unite.vim',
       \ 'autoload' : {
-      \   'unite_sources' : ['watson', 'watson/dirty', 'watson/clean', 'watson/current_file'],
+      \   'unite_sources' : ['tamago', 'tamago/dirty', 'tamago/clean', 'tamago/current_file'],
       \ }}
 ```
 
-*Install watson*
+*Install tamago*
 
 ```sh
-git clone https://github.com/nhmood/watson-ruby/
-cd watson-ruby
+git clone https://github.com/nhmood/tamago-ruby/
+cd tamago-ruby
 rake install
 ```
 
 ## Usage
 
 - `:Watson [{options}]`
-- `:Unite watson`
-- `:Unite watson/dirty`
-- `:Unite watson/clean`
-- `:Unite watson/current_file`
+- `:Unite tamago`
+- `:Unite tamago/dirty`
+- `:Unite tamago/clean`
+- `:Unite tamago/current_file`
 
 ## Example
 
@@ -59,11 +59,11 @@ if has('vim_starting')
   call neobundle#rc(s:bundle_dir)
 endif
 
-NeoBundleLazy 'alpaca-tc/vim-unite-watson.vim', {
+NeoBundleLazy 'alpaca-tc/vim-unite-tamago.vim', {
       \ 'commands' : 'Watson',
       \ 'depends' : 'Shougo/unite.vim',
       \ 'autoload' : {
-      \   'unite_sources' : ['watson', 'watson/dirty', 'watson/clean', 'watson/current_file'],
+      \   'unite_sources' : ['tamago', 'tamago/dirty', 'tamago/clean', 'tamago/current_file'],
       \ }}
 
 if has('vim_starting') && neobundle#exists_not_installed_bundles()
@@ -72,6 +72,6 @@ endif
 
 filetype plugin indent on
 
-nnoremap <silent><C-J>d :Unite watson/dirty<CR>
-nnoremap <silent><C-J>c :Unite watson/current_file<CR>
+nnoremap <silent><C-J>d :Unite tamago/dirty<CR>
+nnoremap <silent><C-J>c :Unite tamago/current_file<CR>
 ```

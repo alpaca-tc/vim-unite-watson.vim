@@ -1,13 +1,13 @@
 let s:source = {
-      \ 'name' : 'watson/current_file',
+      \ 'name' : 'tamago/current_file',
       \ 'hooks' : {},
       \ 'syntax' : 'uniteSource__WatsonCurrentFile',
       \ 'is_multiline' : 1,
-      \ 'description' : 'candidates from watson',
+      \ 'description' : 'candidates from tamago',
       \ 'default_kind' : 'jump_list',
       \ }
 
-function! unite#sources#watson#current_file#define() "{{{
+function! unite#sources#tamago#current_file#define() "{{{
   return [s:source]
 endfunction"}}}
 
@@ -26,7 +26,7 @@ endfunction"}}}
 function! s:source.gather_candidates(args, context) "{{{
   let absolute_path = expand('%:p')
   let option = '--files ' . absolute_path
-  let candidates = unite#sources#watson#utils#get_results(absolute_path, option)
+  let candidates = unite#sources#tamago#utils#get_results(absolute_path, option)
 
   if !empty(candidates) && candidates[0].action__has_issue
     return map(sort(candidates, 's:sort'), 's:format(v:val)')
